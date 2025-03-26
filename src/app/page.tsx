@@ -1,25 +1,43 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+"use client"
+
+import { useState } from "react";
+import { Button } from "./ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card"
+import { Badge } from "./ui/badge"
 import { CheckCircle2, Cloud, ExternalLink, Plus, RefreshCw } from "lucide-react"
+import Link from 'next/link'
+
+// Define a type for the connection status
+type ConnectionStatus = {
+  microsoft365: boolean;
+  googleWorkspace: boolean;
+  dropbox: boolean;
+  slack: boolean;
+  box: boolean;
+  zoom: boolean;
+};
 
 export default function Home() {
+  // State to manage connection status
+  const [connections, setConnections] = useState<ConnectionStatus>({
+    microsoft365: false, // Assuming Microsoft 365 is already connected
+    googleWorkspace: false,
+    dropbox: false,
+    slack: false, // Assuming Slack is already connected
+    box: false,
+    zoom: false,
+  });
+
+  // Function to handle connection/disconnection
+  const toggleConnection = (service: keyof ConnectionStatus) => {
+    setConnections((prev) => {
+      const isConnected = prev[service];
+      return { ...prev, [service]: !isConnected }; // Toggle connection status
+    });
+  };
+
   return (
     <main className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b">
-        <div className="container flex h-16 items-center px-4 md:px-6">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <nav className="ml-auto flex gap-4 sm:gap-6">
-            <Button variant="ghost">Overview</Button>
-            <Button variant="ghost">Users</Button>
-            <Button variant="ghost" className="font-medium">
-              Integrations
-            </Button>
-            <Button variant="ghost">Settings</Button>
-          </nav>
-        </div>
-      </div>
 
       {/* Main Content */}
       <div className="container px-4 py-6 md:px-6 md:py-12 lg:py-16">
@@ -50,27 +68,41 @@ export default function Home() {
                   <CardDescription>Connect to Microsoft 365 apps</CardDescription>
                 </div>
                 <Badge variant="outline" className="ml-auto">
-                  Connected
+                  {connections.microsoft365 ? "Connected" : "Not Connected"}
                 </Badge>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <p>Access files from OneDrive, manage emails, and sync calendars with your workspace.</p>
                 </div>
-                <div className="mt-4 flex items-center text-sm text-green-600">
-                  <CheckCircle2 className="mr-1 h-4 w-4" />
-                  <span>Connected as admin@company.com</span>
-                </div>
+                {connections.microsoft365 && (
+                  <div className="mt-4 flex items-center text-sm text-green-600">
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    <span>Connected</span>
+                  </div>
+                )}
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm">
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Refresh
-                </Button>
-                <Button variant="outline" size="sm">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Manage
-                </Button>
+              <CardFooter>
+                {connections.microsoft365 ? (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('microsoft365')}>
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('microsoft365')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Connect Microsoft 365
+                  </Button>
+                )}
+                {connections.microsoft365 && (
+                  <div className="ml-2">
+                    <Link href="/employees">
+                      <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Manage
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardFooter>
             </Card>
 
@@ -101,18 +133,42 @@ export default function Home() {
                   <CardTitle>Google Workspace</CardTitle>
                   <CardDescription>Connect to Google services</CardDescription>
                 </div>
-                <Badge className="ml-auto">Not Connected</Badge>
+                <Badge className="ml-auto">
+                  {connections.googleWorkspace ? "Connected" : "Not Connected"}
+                </Badge>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <p>Integrate with Gmail, Google Drive, Google Calendar, and other Google services.</p>
                 </div>
+                {connections.googleWorkspace && (
+                  <div className="mt-4 flex items-center text-sm text-green-600">
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    <span>Connected</span>
+                  </div>
+                )}
               </CardContent>
               <CardFooter>
-                <Button className="w-full">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Connect Google Workspace
-                </Button>
+                {connections.googleWorkspace ? (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('googleWorkspace')}>
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('googleWorkspace')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Connect Google Workspace
+                  </Button>
+                )}
+                {connections.googleWorkspace && (
+                  <div className="ml-2">
+                    <Link href="/employees">
+                      <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Manage
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardFooter>
             </Card>
 
@@ -128,18 +184,42 @@ export default function Home() {
                   <CardTitle>Dropbox</CardTitle>
                   <CardDescription>Connect to Dropbox storage</CardDescription>
                 </div>
-                <Badge className="ml-auto">Not Connected</Badge>
+                <Badge className="ml-auto">
+                  {connections.dropbox ? "Connected" : "Not Connected"}
+                </Badge>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <p>Access and share files from your Dropbox account directly in your workspace.</p>
                 </div>
+                {connections.dropbox && (
+                  <div className="mt-4 flex items-center text-sm text-green-600">
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    <span>Connected</span>
+                  </div>
+                )}
               </CardContent>
               <CardFooter>
-                <Button className="w-full">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Connect Dropbox
-                </Button>
+                {connections.dropbox ? (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('dropbox')}>
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('dropbox')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Connect Dropbox
+                  </Button>
+                )}
+                {connections.dropbox && (
+                  <div className="ml-2">
+                    <Link href="/employees">
+                      <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Manage
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardFooter>
             </Card>
 
@@ -156,27 +236,41 @@ export default function Home() {
                   <CardDescription>Connect to Slack workspace</CardDescription>
                 </div>
                 <Badge variant="outline" className="ml-auto">
-                  Connected
+                  {connections.slack ? "Connected" : "Not Connected"}
                 </Badge>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <p>Integrate with your Slack channels for seamless communication and notifications.</p>
                 </div>
-                <div className="mt-4 flex items-center text-sm text-green-600">
-                  <CheckCircle2 className="mr-1 h-4 w-4" />
-                  <span>Connected to workspace: Company HQ</span>
-                </div>
+                {connections.slack && (
+                  <div className="mt-4 flex items-center text-sm text-green-600">
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    <span>Connected</span>
+                  </div>
+                )}
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm">
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Refresh
-                </Button>
-                <Button variant="outline" size="sm">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Manage
-                </Button>
+              <CardFooter>
+                {connections.slack ? (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('slack')}>
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('slack')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Connect Slack
+                  </Button>
+                )}
+                {connections.slack && (
+                  <div className="ml-2">
+                    <Link href="/employees">
+                      <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Manage
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardFooter>
             </Card>
 
@@ -192,18 +286,42 @@ export default function Home() {
                   <CardTitle>Box</CardTitle>
                   <CardDescription>Connect to Box storage</CardDescription>
                 </div>
-                <Badge className="ml-auto">Not Connected</Badge>
+                <Badge className="ml-auto">
+                  {connections.box ? "Connected" : "Not Connected"}
+                </Badge>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <p>Access and manage your Box files and folders directly from your workspace.</p>
                 </div>
+                {connections.box && (
+                  <div className="mt-4 flex items-center text-sm text-green-600">
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    <span>Connected</span>
+                  </div>
+                )}
               </CardContent>
               <CardFooter>
-                <Button className="w-full">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Connect Box
-                </Button>
+                {connections.box ? (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('box')}>
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('box')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Connect Box
+                  </Button>
+                )}
+                {connections.box && (
+                  <div className="ml-2">
+                    <Link href="/employees">
+                      <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Manage
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardFooter>
             </Card>
 
@@ -219,18 +337,42 @@ export default function Home() {
                   <CardTitle>Zoom</CardTitle>
                   <CardDescription>Connect to Zoom meetings</CardDescription>
                 </div>
-                <Badge className="ml-auto">Not Connected</Badge>
+                <Badge className="ml-auto">
+                  {connections.zoom ? "Connected" : "Not Connected"}
+                </Badge>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <p>Schedule and join Zoom meetings directly from your workspace calendar.</p>
                 </div>
+                {connections.zoom && (
+                  <div className="mt-4 flex items-center text-sm text-green-600">
+                    <CheckCircle2 className="mr-1 h-4 w-4" />
+                    <span>Connected</span>
+                  </div>
+                )}
               </CardContent>
               <CardFooter>
-                <Button className="w-full">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Connect Zoom
-                </Button>
+                {connections.zoom ? (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('zoom')}>
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400" onClick={() => toggleConnection('zoom')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Connect Zoom
+                  </Button>
+                )}
+                {connections.zoom && (
+                  <div className="ml-2">
+                    <Link href="/employees">
+                      <Button variant="outline" size="sm" className="bg-gray-300 hover:bg-gray-400">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Manage
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardFooter>
             </Card>
           </div>
@@ -239,19 +381,19 @@ export default function Home() {
           <div className="mt-8">
             <h3 className="text-xl font-semibold mb-4">More Integrations</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2">
+              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-gray-300 hover:bg-gray-400">
                 <Cloud className="h-6 w-6" />
                 <span>AWS</span>
               </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2">
+              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-gray-300 hover:bg-gray-400">
                 <Cloud className="h-6 w-6" />
                 <span>Azure</span>
               </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2">
+              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-gray-300 hover:bg-gray-400">
                 <Cloud className="h-6 w-6" />
                 <span>Salesforce</span>
               </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2">
+              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-gray-300 hover:bg-gray-400">
                 <Cloud className="h-6 w-6" />
                 <span>Jira</span>
               </Button>

@@ -1,24 +1,23 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
+"use client"; // Mark as a client component
 
-const inter = Inter({ subsets: ["latin"] })
+import React from 'react';
+import { Inter } from "next/font/google";
+import MenuBar from './components/MenuBar'; // Adjust the import path as necessary
+import './globals.css';
 
-export const metadata: Metadata = {
-  title: "Simple Next.js App",
-  description: "A simple Next.js app ready to deploy",
-}
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode
+    children: React.ReactNode;
 }) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  )
+    return (
+        <html lang="en">
+            <body className={inter.className}>
+                <MenuBar /> {/* Include the MenuBar here */}
+                {children}
+            </body>
+        </html>
+    );
 }
-
